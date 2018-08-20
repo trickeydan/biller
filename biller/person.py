@@ -3,6 +3,7 @@ import os
 
 from .io import YamlObject
 from .payment import PaymentList
+from .period import PeriodList
 
 
 class PersonType(enum.Enum):
@@ -17,6 +18,7 @@ class Person:
         self.data = data
         self.slug = slug
         self.payment_list = None
+        self.period_list = None
 
     @property
     def name(self):
@@ -39,6 +41,12 @@ class Person:
         if self.payment_list is None:
             self.payment_list = PaymentList.load(self.slug)
         return self.payment_list
+
+    @property
+    def periods(self):
+        if self.period_list is None:
+            self.period_list = PeriodList.load(self.slug)
+        return self.period_list
 
 
 class People(YamlObject):
