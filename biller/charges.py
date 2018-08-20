@@ -2,10 +2,12 @@ import enum
 
 from .payment import PaymentAmount
 
+
 class ChargeType(enum.Enum):
 
     STATIC = 'static'
     VARIABLE = 'variable'
+
 
 class Charge:
 

@@ -20,6 +20,12 @@ class PaymentAmount:
     def __str__(self):
         return "£{}".format(self.pounds)
 
+    def __add__(self, other):
+        return PaymentAmount(self.raw_pence + other.raw_pence)
+
+    def __iadd__(self, other):
+        self.raw_pence += other.raw_pence
+
 
 class Payment:
 
