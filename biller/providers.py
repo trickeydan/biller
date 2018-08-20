@@ -35,3 +35,17 @@ class Providers(YamlObject):
 
     def get_provider(self, slug):
         return Provider(self.data[slug], slug)
+
+    def __iter__(self):
+        self.position = -1  # Nasty Hack ALERT!
+        return self
+
+    def __next__(self):
+        self.position += 1
+        if self.position >= len(self.data.keys()):
+            raise StopIteration
+        slug = list(self.data.keys())[self.position]
+        return Provider(self.data[slug], slug)
+
+    def __len__(self):
+        return len(self.data.keys())
