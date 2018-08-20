@@ -3,6 +3,7 @@ import os
 
 from .io import YamlObject
 from .payment import PaymentList
+from .payment import PaymentAmount
 from .period import PeriodList
 
 
@@ -47,6 +48,10 @@ class Person:
         if self.period_list is None:
             self.period_list = PeriodList.load(self.slug)
         return self.period_list
+
+    def get_balance(self):
+        # Not implemented
+        return PaymentAmount(0)
 
 
 class People(YamlObject):
