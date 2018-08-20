@@ -3,14 +3,7 @@ import enum
 
 from .io import YamlObject
 from .payment import PaymentAmount
-from .person import PersonType
-
-
-class BillType(enum.Enum):
-
-    STATIC = 'static'
-    VARIABLE = 'variable'
-    MIXED = 'mixed'
+from .charges import ChargeList
 
 
 class Bill:
@@ -33,6 +26,10 @@ class Bill:
     @property
     def amount(self):
         return PaymentAmount(self.data['amount'])
+
+    @property
+    def charges(self):
+        return ChargeList(self.data['charges'])
 
 
 class BillList(YamlObject):
