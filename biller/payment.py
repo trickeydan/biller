@@ -15,7 +15,7 @@ class PaymentAmount:
 
     @property
     def pounds(self):
-        return round(self.pence, 2)
+        return round(self.pence / 100, 2)
 
     def __str__(self):
         return "£{}".format(self.pounds)
@@ -25,6 +25,13 @@ class PaymentAmount:
 
     def __iadd__(self, other):
         self.raw_pence += other.raw_pence
+        return self
+
+    def split(self, number):
+        return PaymentAmount(self.raw_pence / number)
+
+    def ratio(self, present, total):
+        return PaymentAmount(self.raw_pence * present / total)
 
 
 class Payment:

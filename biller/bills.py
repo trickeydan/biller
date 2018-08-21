@@ -1,5 +1,5 @@
 import os
-import enum
+import datetime
 
 from .io import YamlObject
 from .payment import PaymentAmount
@@ -10,6 +10,7 @@ class Bill:
 
     def __init__(self, data):
         self.data = data
+        self.days_set = None
 
     @property
     def payment_date(self):
@@ -31,6 +32,13 @@ class Bill:
     def charges(self):
         return ChargeList(self.data['charges'])
 
+    @property
+    def days(self):
+        if self.days_set is None:
+            self.days_set = set([self.period_start + datetime.timedelta(days=x) for x in range(0, (self.period_end-self.period_start).days)])
+            self.days_set.add(self.period_end)
+        return self.days_set
+
 
 class BillList(YamlObject):
 
@@ -44,6 +52,6 @@ class BillList(YamlObject):
 
     def __next__(self):
         self.position += 1
-        if self.position >= len(self.data):
+        if self.data is None or self.position >= len(self.data):
             raise StopIteration
         return Bill(self.data[self.position])

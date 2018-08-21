@@ -65,6 +65,10 @@ class People(YamlObject):
 
         return Person(self.data[slug], slug)
 
+    @property
+    def num_tenants(self):
+        return 8  # Todo: FIX THIS
+
     def __iter__(self):
         self.position = -1  # Nasty Hack ALERT!
         return self
