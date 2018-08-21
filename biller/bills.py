@@ -1,6 +1,7 @@
 import os
 import datetime
 
+from biller import People
 from .io import YamlObject
 from .payment import PaymentAmount
 from .charges import ChargeList
@@ -11,6 +12,7 @@ class Bill:
     def __init__(self, data):
         self.data = data
         self.days_set = None
+        self.num_people_days = None
 
     @property
     def payment_date(self):
@@ -39,6 +41,18 @@ class Bill:
             self.days_set.add(self.period_end)
         return self.days_set
 
+    @property
+    def people_days(self):
+        if self.num_people_days is None:
+            peo = People.load()
+            self.num_people_days = 0
+            for person in peo:
+                days = set()
+                for period in person.periods:
+                    days |= self.days & period.days
+                self.num_people_days += len(days)
+        return self.num_people_days
+
 
 class BillList(YamlObject):
 
@@ -55,3 +69,8 @@ class BillList(YamlObject):
         if self.data is None or self.position >= len(self.data):
             raise StopIteration
         return Bill(self.data[self.position])
+
+    def __len__(self):
+        if self.data is None:
+            return 0
+        return len(self.data)

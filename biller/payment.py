@@ -11,6 +11,8 @@ class PaymentAmount:
 
     @property
     def pence(self):
+        if self.raw_pence < 0:
+            return math.floor(self.raw_pence)
         return math.ceil(self.raw_pence)
 
     @property
@@ -26,6 +28,9 @@ class PaymentAmount:
     def __iadd__(self, other):
         self.raw_pence += other.raw_pence
         return self
+
+    def __sub__(self, other):
+        return PaymentAmount(self.raw_pence - other.raw_pence)
 
     def split(self, number):
         return PaymentAmount(self.raw_pence / number)
@@ -59,6 +64,8 @@ class PaymentList(YamlObject):
         return self
 
     def __next__(self):
+        if self.data is None:
+            raise StopIteration
         self.position += 1
         if self.position >= len(self.data):
             raise StopIteration

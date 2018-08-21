@@ -25,21 +25,24 @@ def dev():
     pro = Providers.load()
     peo = People.load()
 
-    for person in peo:
-        print("Person: {}".format(person.name))
+    for person in [peo.get_person('lead')]:
+        print("# Person: {}".format(person.name))
+        total_costs = PaymentAmount(0)
         for provider in pro:
-            print("\tService Provider: {}".format(provider.name))
+            print("## Service Provider: {}".format(provider.name))
+            if len(provider.bills) == 0:
+                print("There are no bills for this provider.\n")
             for bill in provider.bills:
-                print("\t\tBill Due: {}".format(bill.payment_date))
-                print("\t\tBill Charge: {}".format(bill.amount))
+                print("### Bill Due: {}\n".format(bill.payment_date))
+                print("Bill Charge: {}\n".format(bill.amount))
                 days = set()
                 for period in person.periods:
                     days |= bill.days & period.days
-                print("\t\t\t{} days in house during this bill period".format(len(days)))
+                print("{} days in house during this bill period\n".format(len(days)))
 
-                print("\t\t\tBreakdown:")
+                print("#### Breakdown:")
 
-                total_due = PaymentAmount(0)
+                provider_total = PaymentAmount(0)
 
                 for charge in bill.charges:
                     if charge.type == ChargeType.STATIC:
@@ -48,14 +51,29 @@ def dev():
                         else:
                             share = PaymentAmount(0)  # Non tenants are handled manually
                     elif charge.type == ChargeType.VARIABLE:
-                        share = charge.amount.ratio(len(days), len(bill.days))  # Todo: Fix me
+                        share = charge.amount.ratio(len(days), bill.people_days)  # Todo: Fix me
                     else:
                         raise Exception("Unknown Charge Type: {}".format(charge.type))
-                    print("\t\t\t\t{}".format(charge.description))
-                    print("\t\t\t\t\t Total: {}".format(charge.amount))
-                    print("\t\t\t\t\t Share: {}".format(share))
-                    total_due += share
+                    print("- {}".format(charge.description))
+                    print("\t - Total: {}".format(charge.amount))
+                    print("\t - Share: {}".format(share))
+                    provider_total += share
 
-                print("\t\t\tShare for this bill: {}".format(total_due))
+                print("\n**Share for this bill: {}**\n".format(provider_total))
+                total_costs += provider_total
+
+        print("## Summary\n")
+        print("Total to pay: {}\n".format(total_costs))
+
+        total_paid = PaymentAmount(0)
+
+        for payment in person.payments:
+            total_paid += payment.amount
+
+        print("Total Paid: {}\n".format(total_paid))
+
+        balance = total_paid - total_costs
+
+        print("**Account Balance: {}**\n".format(balance))
 if __name__ == "__main__":
     cli()
