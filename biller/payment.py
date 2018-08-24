@@ -32,6 +32,10 @@ class PaymentAmount:
     def __sub__(self, other):
         return PaymentAmount(self.raw_pence - other.raw_pence)
 
+    def __isub__(self, other):
+        self.raw_pence -= other.raw_pence
+        return self
+
     def split(self, number):
         return PaymentAmount(self.raw_pence / number)
 
