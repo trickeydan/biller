@@ -45,17 +45,17 @@ def bill(slug):
     total_costs = PaymentAmount(0)
     for provider in pro:
         print("## Service Provider: {}".format(provider.name))
-        if len(provider.bills) == 0:
-            print("There are no bills for this provider.\n")
+        bill_count = 0
         for bill in provider.bills:
-            print("### Bill Due: {}\n".format(bill.payment_date))
-            print("Bill Charge: {}\n".format(bill.amount))
+            if not bill.informed:
+                print("### Bill Due: {}\n".format(bill.payment_date))
+                print("Bill Charge: {}\n".format(bill.amount))
             days = set()
             for period in person.periods:
                 days |= bill.days & period.days
-            print("{} days in house during this bill period\n".format(len(days)))
-
-            print("#### Breakdown:")
+            if not bill.informed:
+                print("{} days in house during this bill period\n".format(len(days)))
+                print("#### Breakdown:")
 
             provider_total = PaymentAmount(0)
 
@@ -69,13 +69,17 @@ def bill(slug):
                     share = charge.amount.ratio(len(days), bill.people_days)  # Todo: Fix me
                 else:
                     raise Exception("Unknown Charge Type: {}".format(charge.type))
-                print("- {}".format(charge.description))
-                print("\t - Total: {}".format(charge.amount))
-                print("\t - Share: {}".format(share))
+                if not bill.informed:
+                    print("- {}".format(charge.description))
+                    print("\t - Total: {}".format(charge.amount))
+                    print("\t - Share: {}".format(share))
                 provider_total += share
 
-            print("\n**Share for this bill: {}**\n".format(provider_total))
+            if not bill.informed:
+                print("\n**Share for this bill: {}**\n".format(provider_total))
             total_costs += provider_total
+        if bill_count == 0:
+            print("There are no bills for this provider.\n")
 
     print("## Summary\n")
     print("Total to pay: {}\n".format(total_costs))

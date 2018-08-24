@@ -53,6 +53,9 @@ class Bill:
                 self.num_people_days += len(days)
         return self.num_people_days
 
+    @property
+    def informed(self):
+        return 'informed' in self.data and self.data['informed']
 
 class BillList(YamlObject):
 
