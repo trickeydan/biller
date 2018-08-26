@@ -17,7 +17,8 @@ def balance():
 
     for provider in providers:
         for bill in provider.bills:
-            amount -= bill.amount
+            if bill.paid:
+                amount -= bill.amount
 
     for person in people:
         for payment in person.payments:

@@ -57,6 +57,10 @@ class Bill:
     def informed(self):
         return 'informed' in self.data and self.data['informed']
 
+    @property
+    def paid(self):
+        return self.payment_date <= datetime.date.today()
+
 class BillList(YamlObject):
 
     @staticmethod
