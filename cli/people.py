@@ -30,7 +30,6 @@ def view(slug):
     click.echo("Preferred Name: {}".format(person.preferred_name))
     click.echo("Preferred Name: {}".format(person.preferred_name))
     click.echo("Type: {}".format(person.type))
-    click.echo("Balance: {}".format(person.get_balance()))
 
 
 @cli.command(help='Calculate the latest bill for a person')
@@ -94,3 +93,53 @@ def bill(slug):
     balance = total_paid - total_costs
 
     print("**Account Balance: {}**\n".format(balance))
+
+@cli.command(help='Calculate the balance for a person')
+@click.argument('slug')
+def balance(slug):
+    pro = Providers.load()
+    peo = People.load()
+
+    person = peo.get_person(slug)
+
+    total_costs = PaymentAmount(0)
+    for provider in pro:
+        bill_count = 0
+        for bill in provider.bills:
+            days = set()
+            for period in person.periods:
+                days |= bill.days & period.days
+
+            provider_total = PaymentAmount(0)
+
+            for charge in bill.charges:
+                if charge.type == ChargeType.STATIC:
+                    if person.type == PersonType.TENANT:
+                        share = charge.amount.split(peo.num_tenants)
+                    else:
+                        share = PaymentAmount(0)  # Non tenants are handled manually
+                elif charge.type == ChargeType.VARIABLE:
+                    share = charge.amount.ratio(len(days), bill.people_days)  # Todo: Fix me
+                else:
+                    raise Exception("Unknown Charge Type: {}".format(charge.type))
+                provider_total += share
+
+            total_costs += provider_total
+
+    total_paid = PaymentAmount(0)
+
+    for payment in person.payments:
+        total_paid += payment.amount
+
+    balance = total_paid - total_costs
+
+    print("{}: {}".format(person.name, balance))
+
+@cli.command(help='Summarise all people')
+@click.pass_context
+def summary(ctx):
+
+    peo = People.load()
+
+    for person in peo:
+        ctx.invoke(balance, slug=person.slug)
