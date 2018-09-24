@@ -45,38 +45,40 @@ def bill(slug):
     for provider in pro:
         print("## Service Provider: {}".format(provider.name))
         bill_count = 0
+        
         for bill in provider.bills:
-            if not bill.informed:
-                print("### Bill Due: {}\n".format(bill.payment_date))
-                print("Bill Charge: {}\n".format(bill.amount))
-            days = set()
-            for period in person.periods:
-                days |= bill.days & period.days
-            if not bill.informed:
-                print("{} days in house during this bill period\n".format(len(days)))
-                print("#### Breakdown:")
-
-            provider_total = PaymentAmount(0)
-
-            for charge in bill.charges:
-                if charge.type == ChargeType.STATIC:
-                    if person.type == PersonType.TENANT:
-                        share = charge.amount.split(peo.num_tenants)
-                    else:
-                        share = PaymentAmount(0)  # Non tenants are handled manually
-                elif charge.type == ChargeType.VARIABLE:
-                    share = charge.amount.ratio(len(days), bill.people_days)  # Todo: Fix me
-                else:
-                    raise Exception("Unknown Charge Type: {}".format(charge.type))
+            if not bill.is_transfer():
                 if not bill.informed:
-                    print("- {}".format(charge.description))
-                    print("\t - Total: {}".format(charge.amount))
-                    print("\t - Share: {}".format(share))
-                provider_total += share
+                    print("### Bill Due: {}\n".format(bill.payment_date))
+                    print("Bill Charge: {}\n".format(bill.amount))
+                days = set()
+                for period in person.periods:
+                    days |= bill.days & period.days
+                if not bill.informed:
+                    print("{} days in house during this bill period\n".format(len(days)))
+                    print("#### Breakdown:")
 
-            if not bill.informed:
-                print("\n**Share for this bill: {}**\n".format(provider_total))
-            total_costs += provider_total
+                provider_total = PaymentAmount(0)
+
+                for charge in bill.charges:
+                    if charge.type == ChargeType.STATIC:
+                        if person.type == PersonType.TENANT:
+                            share = charge.amount.split(peo.num_tenants)
+                        else:
+                            share = PaymentAmount(0)  # Non tenants are handled manually
+                    elif charge.type == ChargeType.VARIABLE:
+                        share = charge.amount.ratio(len(days), bill.people_days)  # Todo: Fix me
+                    else:
+                        raise Exception("Unknown Charge Type: {}".format(charge.type))
+                    if not bill.informed:
+                        print("- {}".format(charge.description))
+                        print("\t - Total: {}".format(charge.amount))
+                        print("\t - Share: {}".format(share))
+                    provider_total += share
+
+                if not bill.informed:
+                    print("\n**Share for this bill: {}**\n".format(provider_total))
+                total_costs += provider_total
         if bill_count == 0:
             print("There are no bills for this provider.\n")
 
@@ -106,23 +108,24 @@ def balance(slug):
     for provider in pro:
         bill_count = 0
         for bill in provider.bills:
-            days = set()
-            for period in person.periods:
-                days |= bill.days & period.days
+            if not bill.is_transfer():
+                days = set()
+                for period in person.periods:
+                    days |= bill.days & period.days
 
-            provider_total = PaymentAmount(0)
+                provider_total = PaymentAmount(0)
 
-            for charge in bill.charges:
-                if charge.type == ChargeType.STATIC:
-                    if person.type == PersonType.TENANT:
-                        share = charge.amount.split(peo.num_tenants)
+                for charge in bill.charges:
+                    if charge.type == ChargeType.STATIC:
+                        if person.type == PersonType.TENANT:
+                            share = charge.amount.split(peo.num_tenants)
+                        else:
+                            share = PaymentAmount(0)  # Non tenants are handled manually
+                    elif charge.type == ChargeType.VARIABLE:
+                        share = charge.amount.ratio(len(days), bill.people_days)  # Todo: Fix me
                     else:
-                        share = PaymentAmount(0)  # Non tenants are handled manually
-                elif charge.type == ChargeType.VARIABLE:
-                    share = charge.amount.ratio(len(days), bill.people_days)  # Todo: Fix me
-                else:
-                    raise Exception("Unknown Charge Type: {}".format(charge.type))
-                provider_total += share
+                        raise Exception("Unknown Charge Type: {}".format(charge.type))
+                    provider_total += share
 
             total_costs += provider_total
 
