@@ -15,6 +15,10 @@ class Bill:
         self.num_people_days = None
 
     @property
+    def account(self):
+        return self.data['account']
+
+    @property
     def payment_date(self):
         return self.data['payment_date']
 
@@ -60,6 +64,15 @@ class Bill:
     @property
     def paid(self):
         return self.payment_date <= datetime.date.today()
+
+    def is_transfer(self):
+        return 'transfer' in self.data and self.data['transfer']
+
+    def transfer_to(self):
+        return self.data["to"]
+
+    def transfer_from(self):
+        return self.data["from"]
 
 class BillList(YamlObject):
 
