@@ -25,6 +25,9 @@ class Provider:
             self.bill_list = BillList.load(self.slug)
         return self.bill_list
 
+    def __str__(self):
+        return self.name
+
 
 class Providers(YamlObject):
     FILE = os.path.join(os.getcwd(), 'data', 'providers.yml')

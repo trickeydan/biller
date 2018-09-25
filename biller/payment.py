@@ -53,6 +53,10 @@ class Payment:
         return self.data['date']
 
     @property
+    def account(self):
+        return self.data['account']
+
+    @property
     def amount(self):
         return PaymentAmount(self.data['amount'])
 

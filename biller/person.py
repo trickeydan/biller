@@ -53,6 +53,9 @@ class Person:
         # Not implemented
         return PaymentAmount(0)
 
+    def __str__(self):
+        return self.name
+
 
 class People(YamlObject):
     FILE = os.path.join(os.getcwd(), 'data', 'people.yml')
