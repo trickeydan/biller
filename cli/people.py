@@ -60,13 +60,14 @@ def bill(slug):
                     if "payment_date" in bill.data:
                         print("### Bill Payment Date: {}\n".format(bill.payment_date))
                     else:
-                        print("### Bill Due in Future")
+                        print("### Bill Payment Date: Not Yet Known")
                     print("Bill Charge: {}\n".format(bill.amount))
                 days = set()
                 for period in person.periods:
                     days |= bill.days & period.days
                 if not bill.informed:
-                    print("{} days in house during this bill period.\n".format(len(days)))
+                    if len(days) > 0 and charge.type != ChargeType.STATIC:
+                        print("{} days in house during this bill period.\n".format(len(days)))
                     print("#### Breakdown:")
 
                 provider_total = PaymentAmount(0)
@@ -93,6 +94,7 @@ def bill(slug):
 
     print("## Summary\n")
 
+
     total_paid = PaymentAmount(0)
 
     for payment in person.payments:
@@ -117,13 +119,12 @@ def balance(slug):
 
     total_costs = PaymentAmount(0)
     for provider in pro:
-        bill_count = 0
         for bill in provider.bills:
             if not bill.is_transfer():
                 days = set()
                 for period in person.periods:
                     days |= bill.days & period.days
-
+                
                 provider_total = PaymentAmount(0)
 
                 for charge in bill.charges:
@@ -138,7 +139,7 @@ def balance(slug):
                         raise Exception("Unknown Charge Type: {}".format(charge.type))
                     provider_total += share
 
-            total_costs += provider_total
+                total_costs += provider_total
 
     total_paid = PaymentAmount(0)
 
