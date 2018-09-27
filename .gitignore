@@ -1,6 +1,8 @@
 # Data Folder
 data/
 
+www/config.py
+
 # Pycharm
 .idea/
 *.iml
