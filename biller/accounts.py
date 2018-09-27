@@ -12,6 +12,14 @@ class Account:
     def name(self):
         return self.data['name']
 
+    @property
+    def balance(self):
+        return "Not Implemented"
+
+    @property
+    def typ(self):
+        return self.data["type"]
+
 
 class AccountList(YamlObject):
     FILE = os.path.join(os.getcwd(), 'data', 'accounts.yml')
