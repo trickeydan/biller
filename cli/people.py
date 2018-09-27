@@ -8,7 +8,6 @@ from biller.charges import ChargeType
 
 p = People.load()
 
-
 @click.group(help='Manage people')
 def cli():
     pass
@@ -43,19 +42,31 @@ def bill(slug):
     print("# Person: {}".format(person.name))
     total_costs = PaymentAmount(0)
     for provider in pro:
-        print("## Service Provider: {}".format(provider.name))
+
+        bill_count = 0
+
+        for bill in provider.bills:
+            if not bill.is_transfer():
+                if not bill.informed:
+                    bill_count += 1
+        if bill_count > 0:
+            print("## Service Provider: {}".format(provider.name))
         bill_count = 0
         
         for bill in provider.bills:
             if not bill.is_transfer():
                 if not bill.informed:
-                    print("### Bill Due: {}\n".format(bill.payment_date))
+                    bill_count += 1
+                    if "payment_date" in bill.data:
+                        print("### Bill Payment Date: {}\n".format(bill.payment_date))
+                    else:
+                        print("### Bill Due in Future")
                     print("Bill Charge: {}\n".format(bill.amount))
                 days = set()
                 for period in person.periods:
                     days |= bill.days & period.days
                 if not bill.informed:
-                    print("{} days in house during this bill period\n".format(len(days)))
+                    print("{} days in house during this bill period.\n".format(len(days)))
                     print("#### Breakdown:")
 
                 provider_total = PaymentAmount(0)
@@ -79,22 +90,22 @@ def bill(slug):
                 if not bill.informed:
                     print("\n**Share for this bill: {}**\n".format(provider_total))
                 total_costs += provider_total
-        if bill_count == 0:
-            print("There are no bills for this provider.\n")
 
     print("## Summary\n")
-    print("Total to pay: {}\n".format(total_costs))
 
     total_paid = PaymentAmount(0)
 
     for payment in person.payments:
         total_paid += payment.amount
 
-    print("Total Paid: {}\n".format(total_paid))
+    print("You have paid {} into the account so far, out of {}.\n".format(total_paid,total_costs))
 
-    balance = total_paid - total_costs
+    bal = total_paid - total_costs
 
-    print("**Account Balance: {}**\n".format(balance))
+    print("**Your Balance: {}**\n".format(bal))
+
+    if bal.is_negative():
+        print("You will need to pay at least {}".format(abs(bal)))
 
 @cli.command(help='Calculate the balance for a person')
 @click.argument('slug')

@@ -36,11 +36,17 @@ class PaymentAmount:
         self.raw_pence -= other.raw_pence
         return self
 
+    def __abs__(self):
+        return PaymentAmount(abs(self.raw_pence))
+
     def split(self, number):
         return PaymentAmount(self.raw_pence / number)
 
     def ratio(self, present, total):
         return PaymentAmount(self.raw_pence * present / total)
+
+    def is_negative(self):
+        return self.raw_pence < 0
 
 
 class Payment:
