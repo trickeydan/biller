@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
 
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{{ url_for('accounts.index') }}"><span>Accounts</span></a></li>
+{% endblock %}
+
 {% block content %}
 <div class="table-responsive">
     <table class="table">

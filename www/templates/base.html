@@ -26,7 +26,8 @@
         <div class="container">
             <h1>{{ title }}</h1>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a><span>{{ VIEW_CONFIG["SITE_TITLE"] }}</span></a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}"><span>{{ VIEW_CONFIG["SITE_TITLE"] }}</span></a></li>
+                {% block breadcrumbs %}{% endblock %}
                 <li class="breadcrumb-item"><a><span>{{ title }}</span></a></li>
             </ol>
             {% block content %}{% endblock %}

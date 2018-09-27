@@ -65,7 +65,6 @@ class People(YamlObject):
         return People(People.FILE)
 
     def get_person(self, slug):
-
         return Person(self.data[slug], slug)
 
     @property

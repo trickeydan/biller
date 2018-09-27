@@ -28,9 +28,9 @@ class AccountList(YamlObject):
     def load():
         return AccountList(AccountList.FILE)
 
-    def get_person(self, slug):
+    def get_account(self, slug):
 
-        return Person(self.data[slug], slug)
+        return Account(self.data[slug], slug)
 
     def __iter__(self):
         self.position = -1  # Nasty Hack ALERT!

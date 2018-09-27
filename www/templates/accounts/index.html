@@ -17,7 +17,7 @@
                 <td>{{ account.name }}</td>
                 <td>{{ account.typ }}</td>
                 <td>{{ account.balance }}</td>
-                <td>View Details</td>
+                <td><a href="{{ url_for('accounts.view', account_slug=account.slug) }}">View Details</a></td>
             </tr>
             {% endfor %}
         </tbody>
